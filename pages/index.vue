@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Application, Graphics } from "pixi.js"
-import type { JewelType } from "@/interfaces"
+import type { JewelType, BlockType } from "@/interfaces"
 import { jewelList } from "@/jewelData"
 
 const pixiContainer = ref<HTMLDivElement | null>(null)
@@ -10,9 +10,17 @@ const jewelMax = ref(3)
 const jewelTop = ref(50)
 const jewelLeft = ref(50)
 
-const makeJewel = (app: Application, drawLeft: Ref<number>, drawTop: Ref<number>, jewelIndex: number) => {
+const block = ref<BlockType[]>([])
+
+const handleClick = () => {
+	rotateBlock(block.value as BlockType[])
+	console.log("-----");
+	consoleBlock(block.value as BlockType[])
+}
+
+const makeJewel = (app: Application, drawLeft: Ref<number>, drawTop: Ref<number>, jewelIndex: number): BlockType => {
 	const jewelColor = jewelList[Math.floor(Math.random()*jewelList.length)]
-	const jewel = new Graphics()
+	const jewel: Graphics = new Graphics()
 		.rect(0, 0, jewelSize.value, jewelSize.value)
 		.fill(jewelColor.color)
 
@@ -20,7 +28,29 @@ const makeJewel = (app: Application, drawLeft: Ref<number>, drawTop: Ref<number>
 
 	jewel.x = drawLeft.value
 	jewel.y = drawTop.value + jewelIndex*jewelSize.value
+	console.log(jewelColor);
+	
+	return { jewel, jewelColor }
 }
+
+const rotateBlock = (block: BlockType[]) => {
+	let tailJewel = block.pop()
+	if (tailJewel != undefined) {
+		block.unshift(tailJewel)
+	}
+	for (const [index, jewel] of block.entries()) {
+		jewel.jewel.y = jewelTop.value + index*jewelSize.value
+	}
+}
+
+const consoleBlock = (block: BlockType[]) => {
+	if (block.length) {
+		for (const [index, jewel] of block.entries()) {
+			console.log(`index: ${index}, jewelColor: ${jewel.jewelColor.name}`);
+		}
+	}
+}
+
 
 onMounted(async () => {
 	if (pixiContainer.value) {
@@ -37,9 +67,12 @@ onMounted(async () => {
 			app.stage.interactive = true
 
 			// jewel
+			block.value = []
 			for (let i = 0; i < jewelMax.value; i++) {
-				makeJewel(app, jewelTop, jewelLeft, i)
+				block.value.push(makeJewel(app, jewelTop, jewelLeft, i))
 			}
+			console.log("-----");
+			consoleBlock(block.value as BlockType[])
 
 		} catch (error) {
 			console.error("Error initializing PixiJS:", error);
@@ -52,5 +85,5 @@ onMounted(async () => {
 </script>
 
 <template>
-	<div ref="pixiContainer" class="pixi-container"></div>
+	<div ref="pixiContainer" class="pixi-container" @click="handleClick"></div>
 </template>
