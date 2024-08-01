@@ -3,21 +3,11 @@ import { Application, Graphics } from "pixi.js"
 import type { JewelType, BlockType } from "@/interfaces"
 import { jewelList } from "@/jewelData"
 
+const config = useAppConfig();
 const pixiContainer = ref<HTMLDivElement | null>(null)
-
-const jewelSize = ref(20)
-const jewelMax = ref(3)
-const jewelTop = ref(50)
-const jewelLeft = ref(50)
-const boardCellHeight = ref(13)
-const boardCellWidth = ref(6)
-const startTopId = ref(0)
-const startLeftId = ref(2)
-const boardColor = ref(0x999999)
-
 const block = ref<BlockType[]>([])
-const blockTopId = ref(startTopId.value)
-const blockLeftId = ref(startLeftId.value)
+const blockTopId = ref(config.block.startTopId)
+const blockLeftId = ref(config.block.startLeftId)
 
 const handleClick = () => {
 	rotateBlock()
@@ -28,13 +18,13 @@ const handleClick = () => {
 const makeJewel = (app: Application, jewelIndex: number): BlockType => {
 	const jewelColor = jewelList[Math.floor(Math.random()*jewelList.length)]
 	const jewel: Graphics = new Graphics()
-		.rect(0, 0, jewelSize.value, jewelSize.value)
+		.rect(0, 0, config.jewel.size, config.jewel.size)
 		.fill(jewelColor.color)
 
 	app.stage.addChild(jewel)
 
-	jewel.x = jewelLeft.value + startLeftId.value*jewelSize.value
-	jewel.y = jewelTop.value + (startTopId.value + jewelIndex)*jewelSize.value
+	jewel.x = config.jewel.left + config.block.startLeftId*config.jewel.size
+	jewel.y = config.jewel.top + (config.block.startTopId + jewelIndex)*config.jewel.size
 	console.log(jewelColor);
 	
 	return { jewel, jewelColor }
@@ -42,8 +32,8 @@ const makeJewel = (app: Application, jewelIndex: number): BlockType => {
 
 const setPlace = () => {
 	for (const [index, jewel] of block.value.entries()) {
-		jewel.jewel.x = jewelLeft.value + blockLeftId.value*jewelSize.value
-		jewel.jewel.y = jewelTop.value + (blockTopId.value + index)*jewelSize.value
+		jewel.jewel.x = config.jewel.left + blockLeftId.value*config.jewel.size
+		jewel.jewel.y = config.jewel.top + (blockTopId.value + index)*config.jewel.size
 	}
 }
 
@@ -72,7 +62,7 @@ const moveLeft = () => {
 }
 
 const moveRight = () => {
-	if (blockLeftId.value < boardCellWidth.value - 1) {
+	if (blockLeftId.value < config.board.cellWidth - 1) {
 		console.log(('Right OK'));
 		blockLeftId.value++
 		setPlace()
@@ -80,7 +70,7 @@ const moveRight = () => {
 }
 
 const moveDown = () => {
-	if (blockTopId.value < boardCellHeight.value - jewelMax.value) {
+	if (blockTopId.value < config.board.cellHeight - config.jewel.length) {
 		console.log('Down OK');
 		blockTopId.value++
 		setPlace()
@@ -130,15 +120,15 @@ onMounted(async () => {
 
 			// stage
 			const board: Graphics = new Graphics()
-				.rect(0, 0, boardCellWidth.value*jewelSize.value, boardCellHeight.value*jewelSize.value)
-				.fill(boardColor.value)
+				.rect(0, 0, config.board.cellWidth*config.jewel.size, config.board.cellHeight*config.jewel.size)
+				.fill(config.board.color)
 			app.stage.addChild(board)
-			board.x = jewelLeft.value
-			board.y = jewelTop.value
+			board.x = config.jewel.left
+			board.y = config.jewel.top
 
 			// jewel
 			block.value = []
-			for (let i = 0; i < jewelMax.value; i++) {
+			for (let i = 0; i < config.jewel.length; i++) {
 				block.value.push(makeJewel(app, i))
 			}
 			console.log("-----");
