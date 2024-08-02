@@ -5,7 +5,9 @@ import { jewelList } from "@/jewelData"
 
 const config = useAppConfig();
 const pixiContainer = ref<HTMLDivElement | null>(null)
+const app = ref<Application| null>()
 const block = ref<BlockType[]>([])
+const boardJewels = ref<(BlockType | null)[][]>(Array.from({ length: config.board.cellHeight }, () => Array(config.board.cellWidth).fill(null)))
 const blockTopId = ref(config.block.startTopId)
 const blockLeftId = ref(config.block.startLeftId)
 
@@ -15,13 +17,13 @@ const handleClick = () => {
 	consoleBlock()
 }
 
-const makeJewel = (app: Application, jewelIndex: number): BlockType => {
+const makeJewel = (jewelIndex: number): BlockType => {
 	const jewelColor = jewelList[Math.floor(Math.random()*jewelList.length)]
 	const jewel: Graphics = new Graphics()
 		.rect(0, 0, config.jewel.size, config.jewel.size)
 		.fill(jewelColor.color)
 
-	app.stage.addChild(jewel)
+	if (app.value) app.value.stage.addChild(jewel)
 
 	jewel.x = config.jewel.left + config.block.startLeftId*config.jewel.size
 	jewel.y = config.jewel.top + (config.block.startTopId + jewelIndex)*config.jewel.size
@@ -53,6 +55,12 @@ const consoleBlock = () => {
 	}
 }
 
+const consoleBoardJewels = () => {
+	boardJewels.value.forEach((row, rowIndex) => {
+		console.log(row);
+	})
+}
+
 const moveLeft = () => {
 	if (blockLeftId.value > 0) {
 		console.log('Left OK');
@@ -63,17 +71,37 @@ const moveLeft = () => {
 
 const moveRight = () => {
 	if (blockLeftId.value < config.board.cellWidth - 1) {
-		console.log(('Right OK'));
+		console.log('Right OK');
 		blockLeftId.value++
 		setPlace()
 	}
 }
 
 const moveDown = () => {
-	if (blockTopId.value < config.board.cellHeight - config.jewel.length) {
+	if (blockTopId.value < config.board.cellHeight - config.jewel.length && boardJewels.value[blockTopId.value + 3][blockLeftId.value] === null) {
 		console.log('Down OK');
 		blockTopId.value++
 		setPlace()
+	} else {
+		console.log(blockTopId.value, blockLeftId.value);
+		console.log(boardJewels.value[blockTopId.value][blockLeftId.value]);
+		for (const [index, jewel] of block.value.entries()) {
+			console.log(jewel.jewel);
+			boardJewels.value[blockTopId.value + index][blockLeftId.value] = jewel
+		}
+		consoleBoardJewels()
+
+		//reset blockPlace
+		blockTopId.value = config.block.startTopId
+		blockLeftId.value = config.block.startLeftId
+
+		// reset block
+		block.value = []
+		for (let i = 0; i < config.jewel.length; i++) {
+			block.value.push(makeJewel(i))
+		}
+		console.log("-----");
+		consoleBoardJewels()
 	}
 }
 
@@ -109,30 +137,30 @@ onMounted(async () => {
 		const canvas = document.createElement('canvas');
 		pixiContainer.value.appendChild(canvas);
 		try {
-			const app = new Application();
-			await app.init({
+			app.value = new Application();
+			await app.value.init({
 				view: canvas,
 				width: 800,
 				height: 600,
 				backgroundColor: 0x000000,
 			})
-			app.stage.interactive = true
+			app.value.stage.interactive = true
 
 			// stage
 			const board: Graphics = new Graphics()
 				.rect(0, 0, config.board.cellWidth*config.jewel.size, config.board.cellHeight*config.jewel.size)
 				.fill(config.board.color)
-			app.stage.addChild(board)
+			app.value.stage.addChild(board)
 			board.x = config.jewel.left
 			board.y = config.jewel.top
 
 			// jewel
 			block.value = []
 			for (let i = 0; i < config.jewel.length; i++) {
-				block.value.push(makeJewel(app, i))
+				block.value.push(makeJewel(i))
 			}
 			console.log("-----");
-			consoleBlock()
+			//consoleBlock()
 
 		} catch (error) {
 			console.error("Error initializing PixiJS:", error);
