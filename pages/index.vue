@@ -56,9 +56,31 @@ const consoleBlock = () => {
 }
 
 const consoleBoardJewels = () => {
-	boardJewels.value.forEach((row, rowIndex) => {
-		console.log(row);
+	let line: string = ''
+	boardJewels.value.map(row => {
+		row.map(col => {
+			line += col ? String(col.jewelColor.name) : 'None'
+			line += '	'
+		})
+		line += '\n'
 	})
+	console.log(line);
+}
+
+const checkUpRight = () => {
+	return 'a'
+}
+
+const checkRight = () => {
+	return 'b'
+}
+
+const checkDownRight = () => {
+	return 'c'
+}
+
+const checkDown = () => {
+	return 'd'
 }
 
 const moveLeft = () => {
@@ -86,10 +108,43 @@ const moveDown = () => {
 		console.log(blockTopId.value, blockLeftId.value);
 		console.log(boardJewels.value[blockTopId.value][blockLeftId.value]);
 		for (const [index, jewel] of block.value.entries()) {
-			console.log(jewel.jewel);
+			console.log(jewel.jewelColor.name);
 			boardJewels.value[blockTopId.value + index][blockLeftId.value] = jewel
 		}
-		consoleBoardJewels()
+
+		//roop
+		//check jewel
+		let line = ''
+		console.log('line---');
+		boardJewels.value.map((row, rowId) => {
+			line = ''
+			row.map((col, colId) => {
+				// col -> x, width
+				// row -> y, height
+				//console.log(colId, rowId);
+				line += '['
+				if (colId <= config.board.cellWidth - config.jewel.length) {
+					if (rowId <= config.board.cellHeight - config.jewel.length) {
+						line += checkDownRight()
+					}
+					if (rowId >= config.jewel.length - 1) {
+						line += checkUpRight()
+					}
+					line += checkRight()
+				}
+				if (rowId <= config.board.cellHeight - config.jewel.length) {
+					line += checkDown()
+				}
+				line += '	'
+			})
+			console.log(line);
+			console.log('---');
+			
+		})
+		
+
+		//delete jewel
+
 
 		//reset blockPlace
 		blockTopId.value = config.block.startTopId
