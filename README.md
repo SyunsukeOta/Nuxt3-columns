@@ -1,75 +1,54 @@
-# Nuxt 3 Minimal Starter
+## 開発サーバでの実行
+- 場所: http://localhost:3000
+- 今回は npm で実行
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
+```sh
 npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
+## ビルド
+```sh
 npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+## コラムスの開発手順
+![開発手順](assets/imgs/開発手順.png)
 
-```bash
-# npm
-npm run preview
+![移植前のコラムスのプレイ画面](assets/imgs/プレイ画面.png)
 
-# pnpm
-pnpm run preview
+### A. 宝石の設定
+1. 一回につき、1ブロック(3個の宝石が縦に連なっている)が落ちてくる
+2. 宝石は赤、青、緑、黄、オレンジ、紫の6種類
 
-# yarn
-yarn preview
+### B. 宝石のスライド
+3. 一回ボタンを押したら下方向に操作中のブロックがスライドする
 
-# bun
-bun run preview
-```
+### C. ブロックの移動
+4. 左右、下でブロックを操作
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### D. ブロックの停止条件
+5. 下に移動できなければ(地面や宝石と接すれば)、操作中のブロックは止まる
+
+### E. 宝石の削除機能
+6. 同じ種類の宝石が縦、横、斜めに三個以上繋がれば消える
+7. 6で消えた時に、浮いている宝石が下に落ちる
+8. 落ちた後に、6を実行
+
+### F. ゲームオーバーの条件
+9. 一番上のマスのどれかに宝石が設置されたらゲームオーバー
+
+### G. ブロックの自動落下
+10. 一定時間ごとにブロックを下に落とす
+
+### H. スコアの算出手順
+11. 宝石が消えた時にスコアを増やす
+12. スコアは消えた宝石の数に依存する。
+
+### I. 連鎖によるスコアのボーナス
+13. 宝石が連鎖で消えた時は、スコアがより増える
+
+### J. レベル機能
+14. レベルはスコアに依存する(一定スコアごとにレベルアップ)
+15. レベルが上がると宝石が落ちるスピードが上がる
+
+
