@@ -8,6 +8,7 @@ const pixiContainer = ref<HTMLDivElement | null>(null)
 const app = ref<Application| null>()
 const block = ref<BlockType[]>([])
 const boardJewels = ref<(BlockType | null)[][]>(Array.from({ length: config.board.cellHeight }, () => Array(config.board.cellWidth).fill(null)))
+const deleteJewels = ref<boolean[][]>(Array.from({ length: config.board.cellHeight }, () => Array(config.board.cellWidth).fill(false)))
 const blockTopId = ref(config.block.startTopId)
 const blockLeftId = ref(config.block.startLeftId)
 
@@ -67,19 +68,67 @@ const consoleBoardJewels = () => {
 	console.log(line);
 }
 
-const checkUpRight = () => {
+const checkUpRight = (colId: number, rowId: number, col: BlockType | null) => {
+	let check = true
+	for (let i = 1; i < config.jewel.length; i++) {
+		if (col?.jewelColor.name != boardJewels.value[rowId - i][colId + i]?.jewelColor.name || col == null) {
+			check = false
+		}
+	}
+	//console.log(check);
+	if (check) {
+		for (let i = 0; i < config.jewel.length; i++) {
+			deleteJewels.value[rowId - i][colId + i] = true
+		}
+	}
 	return 'a'
 }
 
-const checkRight = () => {
+const checkRight = (colId: number, rowId: number, col: BlockType | null) => {
+	let check = true
+	for (let i = 1; i < config.jewel.length; i++) {
+		if (col?.jewelColor.name != boardJewels.value[rowId][colId + i]?.jewelColor.name || col == null) {
+			check = false
+		}
+	}
+	//console.log(check);
+	if (check) {
+		for (let i = 0; i < config.jewel.length; i++) {
+			deleteJewels.value[rowId][colId + i] = true
+		}
+	}
 	return 'b'
 }
 
-const checkDownRight = () => {
+const checkDownRight = (colId: number, rowId: number, col: BlockType | null) => {
+	let check = true
+	for (let i = 1; i < config.jewel.length; i++) {
+		if (col?.jewelColor.name != boardJewels.value[rowId + i][colId + i]?.jewelColor.name || col == null) {
+			check = false
+		}
+	}
+	//console.log(check);
+	if (check) {
+		for (let i = 0; i < config.jewel.length; i++) {
+			deleteJewels.value[rowId + i][colId + i] = true
+		}
+	}
 	return 'c'
 }
 
-const checkDown = () => {
+const checkDown = (colId: number, rowId: number, col: BlockType | null) => {
+	let check = true
+	for (let i = 1; i < config.jewel.length; i++) {
+		if (col?.jewelColor.name != boardJewels.value[rowId + i][colId]?.jewelColor.name || col == null) {
+			check = false
+		}
+	}
+	//console.log(check);
+	if (check) {
+		for (let i = 0; i < config.jewel.length; i++) {
+			deleteJewels.value[rowId + i][colId] = true
+		}
+	}
 	return 'd'
 }
 
@@ -125,26 +174,30 @@ const moveDown = () => {
 				line += '['
 				if (colId <= config.board.cellWidth - config.jewel.length) {
 					if (rowId <= config.board.cellHeight - config.jewel.length) {
-						line += checkDownRight()
+						line += checkDownRight(colId, rowId, col as BlockType)
 					}
 					if (rowId >= config.jewel.length - 1) {
-						line += checkUpRight()
+						line += checkUpRight(colId, rowId, col as BlockType)
+						
 					}
-					line += checkRight()
+					line += checkRight(colId, rowId, col as BlockType)
 				}
 				if (rowId <= config.board.cellHeight - config.jewel.length) {
-					line += checkDown()
+					line += checkDown(colId, rowId, col as BlockType)
 				}
 				line += '	'
 			})
-			console.log(line);
-			console.log('---');
-			
 		})
-		
+		console.log(deleteJewels.value);
 
 		//delete jewel
-
+		deleteJewels.value.map((row, rowId) => {
+			row.map((col, colId) => {
+				// col -> x, width
+				// row -> y, height
+				//console.log(colId, rowId);
+			})
+		})
 
 		//reset blockPlace
 		blockTopId.value = config.block.startTopId
