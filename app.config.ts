@@ -1,12 +1,12 @@
 export default defineAppConfig({
 	board: {
-		cellHeight: 13,
-		cellWidth: 6,
+		cellXLen: 6,
+		cellYLen: 13,
 		color: 0x999999,
 	},
 	block: {
-		startTopId: 0,
-		startLeftId: 2,
+		startXId: 0,
+		startYId: 2,
 	},
 	jewel: {
 		size: 20,

@@ -1,230 +1,29 @@
 <script setup lang="ts">
 import { Application, Graphics } from "pixi.js"
-import type { JewelType, BlockType } from "@/interfaces"
-import { jewelList } from "@/jewelData"
+// import type { JewelType, BlockType } from "@/interfaces"
+// import { jewelList } from "@/jewelData"
+
+import { colorMap } from "@/jewelData"
 
 const config = useAppConfig();
 const pixiContainer = ref<HTMLDivElement | null>(null)
 const app = ref<Application| null>()
-const block = ref<BlockType[]>([])
-const boardJewels = ref<(BlockType | null)[][]>(Array.from({ length: config.board.cellHeight }, () => Array(config.board.cellWidth).fill(null)))
-const deleteJewels = ref<boolean[][]>(Array.from({ length: config.board.cellHeight }, () => Array(config.board.cellWidth).fill(false)))
-const blockTopId = ref(config.block.startTopId)
-const blockLeftId = ref(config.block.startLeftId)
+
 
 const handleClick = () => {
-	rotateBlock()
 	console.log("-----");
-	consoleBlock()
 }
 
-const makeJewel = (jewelIndex: number): BlockType => {
-	const jewelColor = jewelList[Math.floor(Math.random()*jewelList.length)]
-	const jewel: Graphics = new Graphics()
-		.rect(0, 0, config.jewel.size, config.jewel.size)
-		.fill(jewelColor.color)
-
-	if (app.value) app.value.stage.addChild(jewel)
-
-	jewel.x = config.jewel.left + config.block.startLeftId*config.jewel.size
-	jewel.y = config.jewel.top + (config.block.startTopId + jewelIndex)*config.jewel.size
-	console.log(jewelColor);
-	
-	return { jewel, jewelColor }
-}
-
-const setPlace = () => {
-	for (const [index, jewel] of block.value.entries()) {
-		jewel.jewel.x = config.jewel.left + blockLeftId.value*config.jewel.size
-		jewel.jewel.y = config.jewel.top + (blockTopId.value + index)*config.jewel.size
-	}
-}
-
-const rotateBlock = () => {
-	let tailJewel = block.value.pop()
-	if (tailJewel != undefined) {
-		block.value.unshift(tailJewel)
-	}
-	setPlace()
-}
-
-const consoleBlock = () => {
-	if (block.value.length) {
-		for (const [index, jewel] of block.value.entries()) {
-			console.log(`index: ${index}, jewelColor: ${jewel.jewelColor.name}`);
-		}
-	}
-}
-
-const consoleBoardJewels = () => {
-	let line: string = ''
-	boardJewels.value.map(row => {
-		row.map(col => {
-			line += col ? String(col.jewelColor.name) : 'None'
-			line += '	'
-		})
-		line += '\n'
-	})
-	console.log(line);
-}
-
-const checkUpRight = (colId: number, rowId: number, col: BlockType | null) => {
-	let check = true
-	for (let i = 1; i < config.jewel.length; i++) {
-		if (col?.jewelColor.name != boardJewels.value[rowId - i][colId + i]?.jewelColor.name || col == null) {
-			check = false
-		}
-	}
-	//console.log(check);
-	if (check) {
-		for (let i = 0; i < config.jewel.length; i++) {
-			deleteJewels.value[rowId - i][colId + i] = true
-		}
-	}
-	return 'a'
-}
-
-const checkRight = (colId: number, rowId: number, col: BlockType | null) => {
-	let check = true
-	for (let i = 1; i < config.jewel.length; i++) {
-		if (col?.jewelColor.name != boardJewels.value[rowId][colId + i]?.jewelColor.name || col == null) {
-			check = false
-		}
-	}
-	//console.log(check);
-	if (check) {
-		for (let i = 0; i < config.jewel.length; i++) {
-			deleteJewels.value[rowId][colId + i] = true
-		}
-	}
-	return 'b'
-}
-
-const checkDownRight = (colId: number, rowId: number, col: BlockType | null) => {
-	let check = true
-	for (let i = 1; i < config.jewel.length; i++) {
-		if (col?.jewelColor.name != boardJewels.value[rowId + i][colId + i]?.jewelColor.name || col == null) {
-			check = false
-		}
-	}
-	//console.log(check);
-	if (check) {
-		for (let i = 0; i < config.jewel.length; i++) {
-			deleteJewels.value[rowId + i][colId + i] = true
-		}
-	}
-	return 'c'
-}
-
-const checkDown = (colId: number, rowId: number, col: BlockType | null) => {
-	let check = true
-	for (let i = 1; i < config.jewel.length; i++) {
-		if (col?.jewelColor.name != boardJewels.value[rowId + i][colId]?.jewelColor.name || col == null) {
-			check = false
-		}
-	}
-	//console.log(check);
-	if (check) {
-		for (let i = 0; i < config.jewel.length; i++) {
-			deleteJewels.value[rowId + i][colId] = true
-		}
-	}
-	return 'd'
-}
-
-const moveLeft = () => {
-	if (blockLeftId.value > 0) {
-		console.log('Left OK');
-		blockLeftId.value--
-		setPlace()
-	}
-}
-
-const moveRight = () => {
-	if (blockLeftId.value < config.board.cellWidth - 1) {
-		console.log('Right OK');
-		blockLeftId.value++
-		setPlace()
-	}
-}
-
-const moveDown = () => {
-	if (blockTopId.value < config.board.cellHeight - config.jewel.length && boardJewels.value[blockTopId.value + 3][blockLeftId.value] === null) {
-		console.log('Down OK');
-		blockTopId.value++
-		setPlace()
-	} else {
-		console.log(blockTopId.value, blockLeftId.value);
-		console.log(boardJewels.value[blockTopId.value][blockLeftId.value]);
-		for (const [index, jewel] of block.value.entries()) {
-			console.log(jewel.jewelColor.name);
-			boardJewels.value[blockTopId.value + index][blockLeftId.value] = jewel
-		}
-
-		//roop
-		//check jewel
-		let line = ''
-		console.log('line---');
-		boardJewels.value.map((row, rowId) => {
-			line = ''
-			row.map((col, colId) => {
-				// col -> x, width
-				// row -> y, height
-				//console.log(colId, rowId);
-				line += '['
-				if (colId <= config.board.cellWidth - config.jewel.length) {
-					if (rowId <= config.board.cellHeight - config.jewel.length) {
-						line += checkDownRight(colId, rowId, col as BlockType)
-					}
-					if (rowId >= config.jewel.length - 1) {
-						line += checkUpRight(colId, rowId, col as BlockType)
-						
-					}
-					line += checkRight(colId, rowId, col as BlockType)
-				}
-				if (rowId <= config.board.cellHeight - config.jewel.length) {
-					line += checkDown(colId, rowId, col as BlockType)
-				}
-				line += '	'
-			})
-		})
-		console.log(deleteJewels.value);
-
-		//delete jewel
-		deleteJewels.value.map((row, rowId) => {
-			row.map((col, colId) => {
-				// col -> x, width
-				// row -> y, height
-				//console.log(colId, rowId);
-			})
-		})
-
-		//reset blockPlace
-		blockTopId.value = config.block.startTopId
-		blockLeftId.value = config.block.startLeftId
-
-		// reset block
-		block.value = []
-		for (let i = 0; i < config.jewel.length; i++) {
-			block.value.push(makeJewel(i))
-		}
-		console.log("-----");
-		consoleBoardJewels()
-	}
-}
 
 const keyAction = (event: KeyboardEvent) => {
 	if (event.key.startsWith('Arrow')) {
 		event.preventDefault()
 		switch (event.key) {
 			case 'ArrowLeft':
-				moveLeft()
 				break;
 			case 'ArrowRight':
-				moveRight()
 				break;
 			case 'ArrowDown':
-				moveDown()
 				break;
 			default:
 				break;
@@ -233,9 +32,7 @@ const keyAction = (event: KeyboardEvent) => {
 	console.log(event.key);
 	if (event.key == ' ') {
 		event.preventDefault()
-		rotateBlock()
 		console.log("-----");
-		consoleBlock()
 	}
 }
 
@@ -255,20 +52,8 @@ onMounted(async () => {
 			app.value.stage.interactive = true
 
 			// stage
-			const board: Graphics = new Graphics()
-				.rect(0, 0, config.board.cellWidth*config.jewel.size, config.board.cellHeight*config.jewel.size)
-				.fill(config.board.color)
-			app.value.stage.addChild(board)
-			board.x = config.jewel.left
-			board.y = config.jewel.top
 
-			// jewel
-			block.value = []
-			for (let i = 0; i < config.jewel.length; i++) {
-				block.value.push(makeJewel(i))
-			}
-			console.log("-----");
-			//consoleBlock()
+			// block
 
 		} catch (error) {
 			console.error("Error initializing PixiJS:", error);
