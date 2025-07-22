@@ -57,11 +57,42 @@ const initBlock = () => {
 	}
 }
 
+// calc
+
+
 // draw
 
 
 // log
+const consoleBlock = () => {
+	if (!activeBlock.value) {
+		console.error("activeBlock is null");
+		return;
+	}
+	activeBlock.value.forEach((jewel, index) => {
+		if (!jewel) {
+			console.error(`Jewel at index ${index} is null`);
+			return;
+		} 
+		console.log(`Block ${index}:`, jewel);
+	});
+}
 
+const consoleBoardJewels = () => {
+	if (!boardJewels.value) {
+		console.error("boardJewels is null");
+		return;
+	}
+	let line: string = ''
+	boardJewels.value.map(row => {
+		row.map(col => {
+			line += col ? col.color : 'None'
+			line += '	'
+		})
+		line += '\n'
+	})
+	console.log(line);
+}
 
 // action
 const setBlockPos = (jewelId: number, jewel: Graphics) => {
@@ -69,10 +100,25 @@ const setBlockPos = (jewelId: number, jewel: Graphics) => {
 	jewel.y = config.jewel.top + (config.block.startYId + jewelId) * config.jewel.size
 }
 
+const rotateBlock = () => {
+	if (!activeBlock.value) {
+		console.error("activeBlock is null")
+		return
+	}
+	const lastItem = activeBlock.value[config.jewel.length - 1]
+	for (let i = config.jewel.length - 1; i > 0; i--) {
+		activeBlock.value[i] = activeBlock.value[i - 1]
+	}
+	activeBlock.value[0] = lastItem
+	activeBlock.value.map((jewel, index) => {
+		setBlockPos(index, jewel?.jewel as Graphics)
+	})
+}
 
 const handleClick = () => {
-	console.log("指");
-	
+	console.log("指")
+	rotateBlock()
+	consoleBlock()
 }
 
 const keyAction = (event: KeyboardEvent) => {
@@ -80,22 +126,23 @@ const keyAction = (event: KeyboardEvent) => {
 		event.preventDefault()
 		switch (event.key) {
 			case 'ArrowLeft':
-				console.log("左");
-				break;
+				console.log("左")
+				break
 			case 'ArrowRight':
-				console.log("右");
-				break;
+				console.log("右")
+				break
 			case 'ArrowDown':
-				console.log("下");
-				break;
+				console.log("下")
+				break
 			default:
-				break;
+				break
 		}
 	}
 	console.log(event.key);
 	if (event.key == ' ') {
 		event.preventDefault()
-		console.log("-----");
+		console.log("-----")
+		rotateBlock()
 	}
 }
 
@@ -121,9 +168,8 @@ onMounted(async () => {
 			// block
 			initBoard()
 			initBlock()
-			console.log("boardJewels: ", boardJewels.value)
-			console.log("activeBlock: ", activeBlock.value);
-			
+			consoleBlock()
+			// consoleBoardJewels()
 
 		} catch (error) {
 			console.error("Error initializing PixiJS:", error);
