@@ -38,15 +38,15 @@ const initBlock = () => {
 			jewel: null,
 			color: Array.from(colorMap.keys())[Math.floor(Math.random()*colorMap.size)],
 			isDelete: false,
-			xId: 3,
-			yId: i,
+			xId: config.block.startXId,
+			yId: config.block.startYId + i,
 		})
 		
-		if (jewel.value) {
+		if (jewel.value && jewel.value.xId != null && jewel.value.yId != null) {
 			jewel.value.jewel = new Graphics()
 				.rect(0, 0, config.jewel.size, config.jewel.size)
 				.fill(jewel.value.color)
-			setBlockPos(i, jewel.value.jewel as Graphics)
+			setBlockPos(jewel.value.xId, jewel.value.yId, jewel.value.jewel as Graphics)
 			if (app.value) {
 				app.value.stage.addChild(jewel.value.jewel as Graphics)
 			}
@@ -95,9 +95,9 @@ const consoleBoardJewels = () => {
 }
 
 // action
-const setBlockPos = (jewelId: number, jewel: Graphics) => {
-	jewel.x = config.jewel.left + config.block.startXId * config.jewel.size
-	jewel.y = config.jewel.top + (config.block.startYId + jewelId) * config.jewel.size
+const setBlockPos = (xId: number, yId: number, jewel: Graphics) => {
+	jewel.x = config.jewel.left + xId * config.jewel.size
+	jewel.y = config.jewel.top + yId * config.jewel.size
 }
 
 const rotateBlock = () => {
@@ -106,12 +106,52 @@ const rotateBlock = () => {
 		return
 	}
 	const lastItem = activeBlock.value[config.jewel.length - 1]
+	const firstYId = activeBlock.value[0]?.yId
+	console.log("firstYId", firstYId);
+	
 	for (let i = config.jewel.length - 1; i > 0; i--) {
 		activeBlock.value[i] = activeBlock.value[i - 1]
 	}
 	activeBlock.value[0] = lastItem
+	if (activeBlock.value[0] && firstYId !== undefined) {
+		activeBlock.value[0].yId = firstYId
+	}
 	activeBlock.value.map((jewel, index) => {
-		setBlockPos(index, jewel?.jewel as Graphics)
+		if (firstYId != undefined && jewel && jewel.xId != null &&jewel.yId != null) {
+			jewel.yId = index + firstYId
+			setBlockPos(jewel.xId, jewel.yId, jewel?.jewel as Graphics)
+			console.log("in map of activeBlock: ", index, jewel.yId);
+			
+		}
+	})
+}
+
+const moveDown = () => {
+	activeBlock.value.map((jewel, index) => {
+		console.log('in moveDown');
+		if (jewel && jewel.xId != null && jewel.yId != null) {
+			console.log('in if');
+			jewel.yId = jewel.yId + 1
+			setBlockPos(jewel.xId, jewel.yId, jewel?.jewel as Graphics)
+		}
+	})
+}
+
+const moveLeft = () => {
+	activeBlock.value.map((jewel, index) => {
+		if (jewel && jewel.xId != null && jewel.yId != null) {
+			jewel.xId = jewel.xId - 1
+			setBlockPos(jewel.xId, jewel.yId, jewel?.jewel as Graphics)
+		}
+	})
+}
+
+const moveRight = () => {
+	activeBlock.value.map((jewel, index) => {
+		if (jewel && jewel.xId != null && jewel.yId != null) {
+			jewel.xId = jewel.xId + 1
+			setBlockPos(jewel.xId, jewel.yId, jewel?.jewel as Graphics)
+		}
 	})
 }
 
@@ -126,23 +166,28 @@ const keyAction = (event: KeyboardEvent) => {
 		event.preventDefault()
 		switch (event.key) {
 			case 'ArrowLeft':
+				moveLeft()
 				console.log("左")
 				break
 			case 'ArrowRight':
+				moveRight()
 				console.log("右")
 				break
 			case 'ArrowDown':
+				moveDown()
 				console.log("下")
 				break
 			default:
 				break
 		}
+		consoleBlock()
 	}
 	console.log(event.key);
 	if (event.key == ' ') {
 		event.preventDefault()
 		console.log("-----")
 		rotateBlock()
+		consoleBlock()
 	}
 }
 
