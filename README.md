@@ -64,8 +64,8 @@ const colorKeys = Array.from(colorMap.keys());
 
 - 宝石の型(JewelType)の用意
   - jewel(Grapics型): 宝石のpixijsで使用するオブジェクト
-  - jewelColor(文字列): 宝石の色を示す
-  - deleteFlag(真偽値): 削除予定かそうでないかのフラグ
+  - color(文字列): 宝石の色を示す
+  - isDelete(真偽値): 削除予定かそうでないかのフラグ
 
 ### B. 宝石のスライド
 3. 一回ボタンを押したら下方向に操作中のブロックがスライドする

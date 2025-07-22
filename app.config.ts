@@ -5,8 +5,8 @@ export default defineAppConfig({
 		color: 0x999999,
 	},
 	block: {
-		startXId: 0,
-		startYId: 2,
+		startXId: 2,
+		startYId: 0,
 	},
 	jewel: {
 		size: 20,
