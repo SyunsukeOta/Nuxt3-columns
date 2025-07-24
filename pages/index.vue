@@ -121,7 +121,10 @@ const checkDeleteRow = (jewel: JewelType, jewelPos: number) => {
 	if (jewel && jewel.xId && jewel.yId) {
 		console.log("Row", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
+		// 壁判定
 		if (jewel.xId - jewelPos < 0 || jewel.xId + (config.jewel.length - 1 - jewelPos) > config.board.cellXLen - 1) return false
+
+		// 宝石定義
 		if (jewelPos == 0) {
 			jewel1 = boardJewels.value[jewel.yId][jewel.xId]
 			jewel2 = boardJewels.value[jewel.yId][jewel.xId+1]
@@ -137,6 +140,8 @@ const checkDeleteRow = (jewel: JewelType, jewelPos: number) => {
 		} else {
 			return false
 		}
+		
+		// フラグ更新
 		console.log(`jewel1: ${jewel1?.color}, jewel2: ${jewel2?.color}, jewel3: ${jewel3?.color}`);
 		if (jewel1 && jewel2 && jewel3 &&jewel1?.color == jewel2?.color && jewel1?.color == jewel3?.color) {
 			jewel1.isDelete = true
@@ -154,7 +159,10 @@ const checkDeleteCol = (jewel: JewelType, jewelPos: number) => {
 	if (jewel && jewel.xId && jewel.yId) {
 		console.log("Col", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
+		// 壁判定
 		if (jewel.yId - jewelPos < 0 || jewel.yId + (config.jewel.length - 1 - jewelPos) > config.board.cellYLen - 1) return false
+
+		// 宝石定義
 		if (jewelPos == 0) {
 			jewel1 = boardJewels.value[jewel.yId][jewel.xId]
 			jewel2 = boardJewels.value[jewel.yId+1][jewel.xId]
@@ -170,6 +178,8 @@ const checkDeleteCol = (jewel: JewelType, jewelPos: number) => {
 		} else {
 			return false
 		}
+
+		// フラグ更新
 		console.log(`jewel1: ${jewel1?.color}, jewel2: ${jewel2?.color}, jewel3: ${jewel3?.color}`);
 		if (jewel1 && jewel2 && jewel3 && jewel1?.color == jewel2?.color && jewel1?.color == jewel3?.color) {
 			jewel1.isDelete = true
@@ -187,8 +197,11 @@ const checkDeleteLT2RU = (jewel: JewelType, jewelPos: number) => {
 	if (jewel && jewel.xId && jewel.yId) {
 		console.log("LT2RU", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
+		// 壁判定
 		if (jewel.xId - jewelPos < 0 || jewel.xId + (config.jewel.length - 1 - jewelPos) > config.board.cellXLen - 1) return false
 		if (jewel.yId - jewelPos < 0 || jewel.yId + (config.jewel.length - 1 - jewelPos) > config.board.cellYLen - 1) return false
+
+		// 宝石定義
 		if (jewelPos == 0) {
 			jewel1 = boardJewels.value[jewel.yId][jewel.xId]
 			jewel2 = boardJewels.value[jewel.yId+1][jewel.xId+1]
@@ -204,6 +217,8 @@ const checkDeleteLT2RU = (jewel: JewelType, jewelPos: number) => {
 		} else {
 			return false
 		}
+
+		// フラグ更新
 		console.log(`jewel1: ${jewel1?.color}, jewel2: ${jewel2?.color}, jewel3: ${jewel3?.color}`);
 		if (jewel1 && jewel2 && jewel3 &&jewel1?.color == jewel2?.color && jewel1?.color == jewel3?.color) {
 			jewel1.isDelete = true
@@ -221,8 +236,11 @@ const checkDeleteLU2RT = (jewel: JewelType, jewelPos: number) => {
 	if (jewel && jewel.xId && jewel.yId) {
 		console.log("LU2RT", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
+		// 壁判定
 		if (jewel.xId - (config.jewel.length - 1 - jewelPos) < 0 || jewel.xId + jewelPos > config.board.cellXLen - 1) return false
 		if (jewel.yId - jewelPos < 0 || jewel.yId + (config.jewel.length - 1 - jewelPos) > config.board.cellYLen - 1) return false
+
+		// 宝石定義
 		if (jewelPos == 0) {
 			jewel1 = boardJewels.value[jewel.yId][jewel.xId]
 			jewel2 = boardJewels.value[jewel.yId+1][jewel.xId-1]
@@ -238,6 +256,8 @@ const checkDeleteLU2RT = (jewel: JewelType, jewelPos: number) => {
 		} else {
 			return false
 		}
+
+		// フラグ更新
 		console.log(`jewel1: ${jewel1?.color}, jewel2: ${jewel2?.color}, jewel3: ${jewel3?.color}`);
 		if (jewel1 && jewel2 && jewel3 &&jewel1?.color == jewel2?.color && jewel1?.color == jewel3?.color) {
 			jewel1.isDelete = true
@@ -267,6 +287,7 @@ const checkJewel = (currXId: number, currYId: number) => {
 
 // draw
 const setBlockPos = (xId: number, yId: number, jewel: Graphics) => {
+	// if (jewel == null) return
 	jewel.x = config.jewel.left + xId * config.jewel.size
 	jewel.y = config.jewel.top + yId * config.jewel.size
 }
@@ -295,6 +316,32 @@ const deleteBoardJewels = () => {
 			} 
 		})
 	})
+}
+
+const slideOneJewel = (xIdx: number, yIdx: number) => {
+	boardJewels.value[yIdx][xIdx]!.yId = (boardJewels.value[yIdx][xIdx]?.yId as number) + 1
+	setBlockPos(
+		boardJewels.value[yIdx][xIdx]?.xId as number,
+		boardJewels.value[yIdx][xIdx]?.yId as number,
+		boardJewels.value[yIdx][xIdx]?.jewel as Graphics
+	)
+	boardJewels.value[yIdx+1][xIdx] = boardJewels.value[yIdx][xIdx]
+	boardJewels.value[yIdx][xIdx] = null
+}
+
+const deleteBlankLine = (lineIdx: number) => {
+	console.log("deleteBlankLine!!!!!!");	
+	let currI = config.board.cellYLen - 2
+	while (currI >= 0) {
+		if (boardJewels.value[currI][lineIdx] && !boardJewels.value[currI+1][lineIdx]) {
+			slideOneJewel(lineIdx, currI)
+			currI++
+			consoleBoardJewels('color')
+		} else {
+			currI--
+		}
+	}
+	return 1000000
 }
 
 // log
@@ -372,19 +419,15 @@ const moveDown = () => {
 			checkJewel(topXId as number, (topYId as number) + i)
 		}
 		deleteBoardJewels()
-		// activeBlock.value.map((jewel) => {
-		// 	if (jewel && jewel.xId != null && jewel.yId != null) {
-		// 		console.log("checkDeleteRow");
-		// 		checkJewel(jewel as JewelType)
-		// 		deleteBoardJewels()
-		// 	}
-		// })
+		for (let i = 0; i < config.board.cellXLen; i++) {
+			let lastBlankIdx = deleteBlankLine(i)
+			// console.log(lastBlankIdx);
+		}
 	}
 	activeBlock.value.map((jewel, index) => {
 		if (jewel && jewel.xId != null && jewel.yId != null) {
 			jewel.yId = jewel.yId + 1
 			setBlockPos(jewel.xId, jewel.yId, jewel?.jewel as Graphics)
-			// ブロック内の宝石の数がいくらでも行けるように記述する予定
 		}
 	})
 }
