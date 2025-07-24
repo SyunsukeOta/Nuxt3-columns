@@ -270,9 +270,20 @@ const checkDeleteLU2RT = (jewel: JewelType, jewelPos: number) => {
 	}
 }
 
+const checkAllJewel = () => {
+	let isDeleted = false
+	boardJewels.value.map((row, yIndex) => {
+		row.map((col, xIndex) => {
+			isDeleted = isDeleted || checkJewel(xIndex, yIndex) as boolean
+		})
+	})
+	return isDeleted
+}
+
 const checkJewel = (currXId: number, currYId: number) => {
 	console.log("-----<checkJewel>-----")
 	console.log(`currXId: ${currXId}, currYId: ${currYId}`)
+	let isDeleted = false
 	for (let i = 0; i < config.jewel.length; i++) {
 		let currJewel = boardJewels.value[currYId][currXId]
 		let isRow = checkDeleteRow(currJewel as JewelType, i)
@@ -281,8 +292,10 @@ const checkJewel = (currXId: number, currYId: number) => {
 		let isLU2RT = checkDeleteLU2RT(currJewel as JewelType, i)
 		console.log(`i = ${i}, Row: ${isRow}, Col: ${isCol}, LT2RU: ${isLT2RU}, LU2RT: ${isLU2RT}`);
 		console.log("----------")
+		isDeleted = isDeleted || isRow as boolean || isCol as boolean || isLT2RU as boolean || isLU2RT as boolean
 	}
 	console.log("-----</checkJewel>-----")
+	return isDeleted
 }
 
 // draw
@@ -329,22 +342,25 @@ const slideOneJewel = (xIdx: number, yIdx: number) => {
 	boardJewels.value[yIdx][xIdx] = null
 }
 
-const deleteBlankLine = (lineIdx: number) => {
-	console.log("deleteBlankLine!!!!!!");	
-	let currI = config.board.cellYLen - 2
-	while (currI >= 0) {
-		console.log(`currI: ${currI}`);
-		if (currI == config.board.cellYLen - 1) {
-			currI--
-			continue
+const deleteBlankAll = () => {
+	for (let lineIdx = 0; lineIdx < config.board.cellXLen; lineIdx++) {
+		console.log(`deleteBlankAll, x = ${lineIdx}`);	
+		let currI = config.board.cellYLen - 2
+		while (currI >= 0) {
+			console.log(`currI: ${currI}`);
+			if (currI == config.board.cellYLen - 1) {
+				currI--
+				continue
+			}
+			if (boardJewels.value[currI][lineIdx] && !boardJewels.value[currI+1][lineIdx]) {
+				slideOneJewel(lineIdx, currI)
+				currI++
+				consoleBoardJewels('color')
+			} else {
+				currI--
+			}
 		}
-		if (boardJewels.value[currI][lineIdx] && !boardJewels.value[currI+1][lineIdx]) {
-			slideOneJewel(lineIdx, currI)
-			currI++
-			consoleBoardJewels('color')
-		} else {
-			currI--
-		}
+
 	}
 	return 0
 }
@@ -424,9 +440,20 @@ const moveDown = () => {
 			checkJewel(topXId as number, (topYId as number) + i)
 		}
 		deleteBoardJewels()
-		for (let i = 0; i < config.board.cellXLen; i++) {
-			deleteBlankLine(i)
+		let isFinish = true
+		let roopcount = 0
+		while (isFinish as boolean) {
+			deleteBlankAll()
+			isFinish = checkAllJewel() as boolean
+			deleteBoardJewels()
+			roopcount++
+			if (roopcount > 10) {
+				console.log("!!>>.!!!");
+				
+				break
+			}
 		}
+
 	}
 	activeBlock.value.map((jewel, index) => {
 		if (jewel && jewel.xId != null && jewel.yId != null) {
