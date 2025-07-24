@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Application, Graphics } from "pixi.js"
-import type { JewelType } from "@/interfaces"
+import { Application, Graphics, BitmapText } from "pixi.js"
+import type { JewelType, TextType } from "@/interfaces"
 import { colorMap } from "@/jewelData"
 
 
@@ -19,6 +19,10 @@ const activeBlock = ref<(JewelType | null)[]>(
 )
 
 const board = ref<(Graphics | null)>(null)
+
+const scoreText = ref<TextType | null>(null)
+const levelText = ref<TextType | null>(null)
+const deleteJewelsText = ref<TextType | null>(null)
 
 // init
 const initBoard = () => {
@@ -56,6 +60,46 @@ const initBlock = () => {
 		activeBlock.value[i] = jewel.value
 	}
 	consoleBoardJewels("color")
+}
+
+const initTitle = () => {
+	let textStyle = {
+		fontFamily: 'Arial',
+		fontSize: 24,
+		fill: 'white',
+	}
+	scoreText.value = {
+		textObj: new BitmapText({
+			text: "score: 0",
+			style: textStyle
+		}),
+		textValue: 0
+	}
+	scoreText.value.textObj.x = config.text.x
+	scoreText.value.textObj.y = config.text.scoreY
+	app.value?.stage.addChild(scoreText.value.textObj as BitmapText)
+
+	levelText.value = {
+		textObj: new BitmapText({
+			text: "level: 0",
+			style: textStyle
+		}),
+		textValue: 0
+	}
+	levelText.value.textObj.x = config.text.x
+	levelText.value.textObj.y = config.text.levelY
+	app.value?.stage.addChild(levelText.value.textObj as BitmapText)
+
+	deleteJewelsText.value = {
+		textObj: new BitmapText({
+			text: "delete jewel count: 0",
+			style: textStyle
+		}),
+		textValue: 0
+	}
+	deleteJewelsText.value.textObj.x = config.text.x
+	deleteJewelsText.value.textObj.y = config.text.jewelCountY
+	app.value?.stage.addChild(deleteJewelsText.value.textObj as BitmapText)
 }
 
 // check
@@ -573,13 +617,14 @@ onMounted(async () => {
 			app.value = new Application();
 			await app.value.init({
 				view: canvas,
-				width: 800,
-				height: 600,
+				width: config.app.x,
+				height: config.app.y,
 				backgroundColor: 0x000000,
 			})
 			app.value.stage.interactive = true
 
 			// stage
+			initTitle()
 
 			// block
 			initBoard()

@@ -1,8 +1,18 @@
 export default defineAppConfig({
+	app: {
+		x: 800,
+		y: 600,
+	},
 	board: {
 		cellXLen: 6,
 		cellYLen: 13,
 		color: 0x999999,
+	},
+	text: {
+		x: 300,
+		scoreY: 200,
+		levelY: 250,
+		jewelCountY: 300,
 	},
 	block: {
 		startXId: 2,
