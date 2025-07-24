@@ -1,10 +1,13 @@
-import type { Graphics } from "pixi.js";
+import type { BitmapText, Graphics } from "pixi.js";
 
 export type JewelType = {
-	name: 'red' | 'green' | 'blue' | 'yellow' | 'orange' | 'purple';
-	color: number;
+  jewel: Graphics | null;
+  color: string;
+  isDelete: boolean;
+  xId: number | null;
+  yId: number | null;
 }
-export type BlockType = {
-	jewel: Graphics;
-	jewelColor: JewelType;
+export type TextType = {
+  textObj: BitmapText;
+  textValue: number;
 }
