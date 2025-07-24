@@ -298,6 +298,21 @@ const checkJewel = (currXId: number, currYId: number) => {
 	return isDeleted
 }
 
+const isGameOver = () => {
+	let isJewelTop = false
+	boardJewels.value[0].map((jewel, index) => {
+		if (jewel?.jewel) {
+			isJewelTop = true
+		}
+	})
+	for (let i = 0; i < config.jewel.length; i++) {
+		if (boardJewels.value[i][config.block.startXId]?.jewel) {
+			isJewelTop = true
+		}
+	}
+	return isJewelTop
+}
+
 // draw
 const setBlockPos = (xId: number, yId: number, jewel: Graphics) => {
 	// if (jewel == null) return
@@ -363,6 +378,19 @@ const deleteBlankAll = () => {
 
 	}
 	return 0
+}
+
+const clearBoardJewels = () => {
+	console.log("clearBoardJewels");
+	boardJewels.value.map((row, yIndex) => {
+		row.map((col, xIndex) => {
+			if (col) {
+				app.value?.stage.removeChild(boardJewels.value[yIndex][xIndex]?.jewel as Graphics)
+				boardJewels.value[yIndex][xIndex] = null				
+			}
+		})
+	})
+	consoleBoardJewels("color")
 }
 
 // log
@@ -448,19 +476,22 @@ const moveDown = () => {
 			deleteBoardJewels()
 			roopcount++
 			if (roopcount > 10) {
-				console.log("!!>>.!!!");
-				
+				console.log("無限ループに入っています!!");
 				break
 			}
 		}
-
-	}
-	activeBlock.value.map((jewel, index) => {
-		if (jewel && jewel.xId != null && jewel.yId != null) {
-			jewel.yId = jewel.yId + 1
-			setBlockPos(jewel.xId, jewel.yId, jewel?.jewel as Graphics)
+		if (isGameOver()) {
+			alert('gameover')
+			clearBoardJewels()
 		}
-	})
+	} else {
+		activeBlock.value.map((jewel, index) => {
+			if (jewel && jewel.xId != null && jewel.yId != null) {
+				jewel.yId = jewel.yId + 1
+				setBlockPos(jewel.xId, jewel.yId, jewel?.jewel as Graphics)
+			}
+		})
+	}
 }
 
 const moveLeft = () => {
