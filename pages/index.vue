@@ -118,7 +118,7 @@ const checkFloor = () => {
 
 const checkDeleteRow = (jewel: JewelType, jewelPos: number) => {
 	// 横チェック
-	if (jewel && jewel.xId && jewel.yId) {
+	if (jewel && jewel.xId !== null && jewel.yId !== null) {
 		console.log("Row", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
 		// 壁判定
@@ -156,7 +156,7 @@ const checkDeleteRow = (jewel: JewelType, jewelPos: number) => {
 
 const checkDeleteCol = (jewel: JewelType, jewelPos: number) => {
 	// 縦チェック
-	if (jewel && jewel.xId && jewel.yId) {
+	if (jewel && jewel.xId !== null && jewel.yId !== null) {
 		console.log("Col", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
 		// 壁判定
@@ -194,7 +194,7 @@ const checkDeleteCol = (jewel: JewelType, jewelPos: number) => {
 
 const checkDeleteLT2RU = (jewel: JewelType, jewelPos: number) => {
 	// 左上と右下チェック
-	if (jewel && jewel.xId && jewel.yId) {
+	if (jewel && jewel.xId !== null && jewel.yId !== null) {
 		console.log("LT2RU", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
 		// 壁判定
@@ -233,7 +233,7 @@ const checkDeleteLT2RU = (jewel: JewelType, jewelPos: number) => {
 
 const checkDeleteLU2RT = (jewel: JewelType, jewelPos: number) => {
 	// 左下と右上チェック
-	if (jewel && jewel.xId && jewel.yId) {
+	if (jewel && jewel.xId !== null && jewel.yId !== null) {
 		console.log("LU2RT", jewel?.xId, jewel?.yId, jewelPos)
 		let jewel1, jewel2, jewel3
 		// 壁判定
@@ -333,6 +333,11 @@ const deleteBlankLine = (lineIdx: number) => {
 	console.log("deleteBlankLine!!!!!!");	
 	let currI = config.board.cellYLen - 2
 	while (currI >= 0) {
+		console.log(`currI: ${currI}`);
+		if (currI == config.board.cellYLen - 1) {
+			currI--
+			continue
+		}
 		if (boardJewels.value[currI][lineIdx] && !boardJewels.value[currI+1][lineIdx]) {
 			slideOneJewel(lineIdx, currI)
 			currI++
@@ -341,7 +346,7 @@ const deleteBlankLine = (lineIdx: number) => {
 			currI--
 		}
 	}
-	return 1000000
+	return 0
 }
 
 // log
@@ -420,8 +425,7 @@ const moveDown = () => {
 		}
 		deleteBoardJewels()
 		for (let i = 0; i < config.board.cellXLen; i++) {
-			let lastBlankIdx = deleteBlankLine(i)
-			// console.log(lastBlankIdx);
+			deleteBlankLine(i)
 		}
 	}
 	activeBlock.value.map((jewel, index) => {
