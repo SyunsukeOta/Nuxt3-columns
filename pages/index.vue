@@ -26,7 +26,7 @@ const board = ref<(Graphics | null)>(null)
 
 const scoreText = ref<TextType | null>(null)
 const levelText = ref<TextType | null>(null)
-const deleteJewelsText = ref<TextType | null>(null)
+const speedText = ref<TextType | null>(null)
 
 // init
 const initBoard = () => {
@@ -66,7 +66,7 @@ const initBlock = () => {
 	consoleBoardJewels("color")
 }
 
-const initTitle = () => {
+const initTexts = () => {
 	let textStyle = {
 		fontFamily: 'Arial',
 		fontSize: 24,
@@ -85,7 +85,7 @@ const initTitle = () => {
 
 	levelText.value = {
 		textObj: new BitmapText({
-			text: "level: 0",
+			text: "level: 1",
 			style: textStyle
 		}),
 		textValue: 0
@@ -94,16 +94,16 @@ const initTitle = () => {
 	levelText.value.textObj.y = config.text.levelY
 	app.value?.stage.addChild(levelText.value.textObj as BitmapText)
 
-	deleteJewelsText.value = {
+	speedText.value = {
 		textObj: new BitmapText({
-			text: "delete jewel count: 0",
+			text: "jewel speed: 1",
 			style: textStyle
 		}),
 		textValue: 0
 	}
-	deleteJewelsText.value.textObj.x = config.text.x
-	deleteJewelsText.value.textObj.y = config.text.jewelCountY
-	app.value?.stage.addChild(deleteJewelsText.value.textObj as BitmapText)
+	speedText.value.textObj.x = config.text.x
+	speedText.value.textObj.y = config.text.jewelCountY
+	app.value?.stage.addChild(speedText.value.textObj as BitmapText)
 }
 
 // check
@@ -379,6 +379,7 @@ const block2Board = () => {
 }
 
 const deleteBoardJewels = () => {
+	let deleteCount: number = 0
 	console.log("isDelete");
 	consoleBoardJewels("isDelete")
 	boardJewels.value.map((row, yIndex) => {
@@ -388,10 +389,11 @@ const deleteBoardJewels = () => {
 				app.value?.stage.removeChild(boardJewels.value[yIndex][xIndex]?.jewel as Graphics)
 				boardJewels.value[yIndex][xIndex] = null
 				console.log(`消去後: ${boardJewels.value[yIndex][xIndex]}`);
-				
+				deleteCount++
 			} 
 		})
 	})
+	return deleteCount
 }
 
 const slideOneJewel = (xIdx: number, yIdx: number) => {
@@ -439,6 +441,25 @@ const clearBoardJewels = () => {
 		})
 	})
 	consoleBoardJewels("color")
+}
+
+const updateTexts = (newDeleteCount: number) => {
+	// scoreText, levelText, speedText
+	// update values
+	scoreText.value!.textValue += newDeleteCount
+	levelText.value!.textValue = Math.min(
+		config.score.maxLevel,
+		1 + Math.floor(scoreText.value!.textValue/config.score.jewelPerLevel)
+	)
+	speedText.value!.textValue = Math.min(
+		config.score.maxSpeed,
+		1 + Math.floor(levelText.value!.textValue/config.score.levelsPerSpeedUp)
+	)
+
+	 // update text objects
+	scoreText.value!.textObj.text = `score: ${scoreText.value!.textValue}`
+	levelText.value!.textObj.text = `level: ${levelText.value!.textValue}`
+	speedText.value!.textObj.text = `jewel speed: ${speedText.value!.textValue}`
 }
 
 // log
@@ -508,6 +529,7 @@ const rotateBlock = () => {
 
 const moveDown = () => {
 	if (checkFloor()) {
+		let deleteCount = 0
 		let topYId = activeBlock.value[0]?.yId
 		let topXId = activeBlock.value[0]?.xId
 		block2Board()
@@ -515,15 +537,15 @@ const moveDown = () => {
 		for (let i = 0; i < config.jewel.length; i++) {
 			checkJewel(topXId as number, (topYId as number) + i)
 		}
-		deleteBoardJewels()
+		deleteCount += deleteBoardJewels()
 		let isFinish = true
-		let roopcount = 0
+		let loopcount = 0
 		while (isFinish as boolean) {
 			deleteBlankAll()
 			isFinish = checkAllJewel() as boolean
-			deleteBoardJewels()
-			roopcount++
-			if (roopcount > 10) {
+			deleteCount += deleteBoardJewels()
+			loopcount++
+			if (loopcount > 10) {
 				console.log("無限ループに入っています!!");
 				break
 			}
@@ -532,6 +554,7 @@ const moveDown = () => {
 			alert('gameover')
 			clearBoardJewels()
 		}
+		updateTexts(deleteCount)
 	} else {
 		activeBlock.value.map((jewel, index) => {
 			if (jewel && jewel.xId != null && jewel.yId != null) {
@@ -639,7 +662,7 @@ onMounted(async () => {
 			app.value.stage.interactive = true
 
 			// stage
-			initTitle()
+			initTexts()
 
 			// block
 			initBoard()

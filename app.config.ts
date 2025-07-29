@@ -14,6 +14,12 @@ export default defineAppConfig({
 		levelY: 250,
 		jewelCountY: 300,
 	},
+	score: {
+		maxSpeed: 5,
+		maxLevel: 25,
+		jewelPerLevel: 20,
+		levelsPerSpeedUp: 5,
+	},
 	block: {
 		startXId: 2,
 		startYId: 0,
