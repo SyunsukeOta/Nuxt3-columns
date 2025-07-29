@@ -8,6 +8,10 @@ const config = useAppConfig();
 const pixiContainer = ref<HTMLDivElement | null>(null)
 const app = ref<Application| null>()
 
+const speed = ref<number>(1)
+const start = ref<DOMHighResTimeStamp>(0)
+const previousTimestamp = ref<DOMHighResTimeStamp>(0)
+
 // objects
 const boardJewels = ref<(JewelType | null)[][]>(
 	Array(config.board.cellYLen).fill(null).map(
@@ -570,6 +574,17 @@ const moveRight = () => {
 	})
 }
 
+const step = (timestamp: DOMHighResTimeStamp) => {
+	if (!start.value) start.value = timestamp
+	if (previousTimestamp.value - start.value >= 1000/speed.value) {
+		moveDown()
+		start.value = timestamp
+	}
+	previousTimestamp.value = timestamp
+	window.requestAnimationFrame(step)
+
+}
+
 const handleClick = () => {
 	console.log("指")
 	rotateBlock()
@@ -631,6 +646,9 @@ onMounted(async () => {
 			initBlock()
 			consoleBlock()
 			// consoleBoardJewels()
+
+			// timer
+			window.requestAnimationFrame(step)
 
 		} catch (error) {
 			console.error("Error initializing PixiJS:", error);
