@@ -3,7 +3,7 @@ import { Application, Graphics, BitmapText } from "pixi.js"
 import type { JewelType, TextType } from "@/interfaces"
 import { colorMap } from "@/jewelData"
 
-
+// settings
 const config = useAppConfig();
 const pixiContainer = ref<HTMLDivElement | null>(null)
 const app = ref<Application| null>()
@@ -12,7 +12,7 @@ const speed = ref<number>(1)
 const start = ref<DOMHighResTimeStamp>(0)
 const previousTimestamp = ref<DOMHighResTimeStamp>(0)
 
-// objects
+// pixi objects
 const boardJewels = ref<(JewelType | null)[][]>(
 	Array(config.board.cellYLen).fill(null).map(
 		() => Array(config.board.cellXLen).fill(null)
@@ -21,9 +21,9 @@ const boardJewels = ref<(JewelType | null)[][]>(
 const activeBlock = ref<(JewelType | null)[]>(
 	Array(config.jewel.length).fill(null)
 )
-
 const board = ref<(Graphics | null)>(null)
 
+// pixi text objects
 const scoreText = ref<TextType | null>(null)
 const levelText = ref<TextType | null>(null)
 const speedText = ref<TextType | null>(null)
@@ -455,11 +455,21 @@ const updateTexts = (newDeleteCount: number) => {
 		config.score.maxSpeed,
 		1 + Math.floor(levelText.value!.textValue/config.score.levelsPerSpeedUp)
 	)
+	updateTextObj()
+}
 
+const updateTextObj = () => {
 	 // update text objects
 	scoreText.value!.textObj.text = `score: ${scoreText.value!.textValue}`
 	levelText.value!.textObj.text = `level: ${levelText.value!.textValue}`
 	speedText.value!.textObj.text = `jewel speed: ${speedText.value!.textValue}`
+}
+
+const resetTexts = () => {
+	scoreText.value!.textValue = 0
+	levelText.value!.textValue = 1
+	speedText.value!.textValue = 1
+	updateTextObj()
 }
 
 // log
@@ -550,11 +560,12 @@ const moveDown = () => {
 				break
 			}
 		}
+		updateTexts(deleteCount)
 		if (isGameOver()) {
 			alert('gameover')
 			clearBoardJewels()
+			resetTexts()
 		}
-		updateTexts(deleteCount)
 	} else {
 		activeBlock.value.map((jewel, index) => {
 			if (jewel && jewel.xId != null && jewel.yId != null) {
