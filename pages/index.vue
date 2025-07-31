@@ -8,6 +8,7 @@ const config = useAppConfig();
 const pixiContainer = ref<HTMLDivElement | null>(null)
 const app = ref<Application| null>()
 
+// timer
 const speed = ref<number>(1)
 const start = ref<DOMHighResTimeStamp>(0)
 const previousTimestamp = ref<DOMHighResTimeStamp>(0)
@@ -67,42 +68,37 @@ const initBlock = () => {
 }
 
 const initTexts = () => {
-	let textStyle = {
-		fontFamily: 'Arial',
-		fontSize: 24,
-		fill: 'white',
-	}
 	scoreText.value = {
 		textObj: new BitmapText({
 			text: "score: 0",
-			style: textStyle
+			style: config.textStyle,
+			x: config.text.x,
+			y: config.text.scoreY,
 		}),
 		textValue: 0
 	}
-	scoreText.value.textObj.x = config.text.x
-	scoreText.value.textObj.y = config.text.scoreY
 	app.value?.stage.addChild(scoreText.value.textObj as BitmapText)
 
 	levelText.value = {
 		textObj: new BitmapText({
 			text: "level: 1",
-			style: textStyle
+			style: config.textStyle,
+			x: config.text.x,
+			y: config.text.levelY,
 		}),
 		textValue: 0
 	}
-	levelText.value.textObj.x = config.text.x
-	levelText.value.textObj.y = config.text.levelY
 	app.value?.stage.addChild(levelText.value.textObj as BitmapText)
 
 	speedText.value = {
 		textObj: new BitmapText({
 			text: "jewel speed: 1",
-			style: textStyle
+			style: config.textStyle,
+			x: config.text.x,
+			y: config.text.speedY,
 		}),
 		textValue: 0
 	}
-	speedText.value.textObj.x = config.text.x
-	speedText.value.textObj.y = config.text.jewelCountY
 	app.value?.stage.addChild(speedText.value.textObj as BitmapText)
 }
 

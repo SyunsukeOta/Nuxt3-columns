@@ -18,6 +18,10 @@ npm run build
   - 後から pinia の store でstateとして静的データ(config)と動的データを一括で管理(app.config.ts)
   - 作成したconfigファイルはvueファイル内でuseAppConfig()を実行して呼び出せる
 
+- ゲームで使用している変数は、composables フォルダに useState で管理
+
+
+
 ## コラムスの開発手順
 ![開発手順](assets/imgs/開発手順.png)
 

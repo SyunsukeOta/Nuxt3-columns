@@ -12,7 +12,7 @@ export default defineAppConfig({
 		x: 300,
 		scoreY: 200,
 		levelY: 250,
-		jewelCountY: 300,
+		speedY: 300,
 	},
 	score: {
 		maxSpeed: 5,
@@ -29,5 +29,10 @@ export default defineAppConfig({
 		length: 3,
 		top: 50,
 		left: 50,
+	},
+	textStyle: {
+		fontFamily: 'Arial',
+		fontSize: 24,
+		fill: 'white',
 	}
 })
