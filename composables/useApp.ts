@@ -7,6 +7,8 @@ export const useApp = () => {
 
   const appObj = useState<AppType>('app', () => ({
     app: new Application(),
+    pixiContainer: null,
+    canvas: null
   }))
 
 
