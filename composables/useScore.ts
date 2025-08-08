@@ -1,9 +1,11 @@
 import type { TextType } from "@/interfaces"
 import { BitmapText } from "pixi.js"
+import { useApp } from "@/composables/useApp"
 
-const config = useAppConfig()
 
 export const useScore = () => {
+  const config = useAppConfig()
+  const { appObj } = useApp()
   const scoreText = useState<TextType>('score', () => ({
     textObj: new BitmapText({
       text: "score: 0",
@@ -14,10 +16,14 @@ export const useScore = () => {
     textValue: 0
   }))
 
-  const initScore = () => {
-    // app.value?.stage.addChild(scoreText.value.textObj as BitmapText)
+  const resetScore = () => {
     scoreText.value.textValue = 0
     scoreText.value.textObj.text = "score: 0"
+  }
+
+  const initScore = () => {
+    appObj.value.app.stage.addChild(scoreText.value.textObj as BitmapText)
+    resetScore()
   }
 
   const updateScore = (score: number) => {
@@ -27,6 +33,7 @@ export const useScore = () => {
 
   return {
     scoreText,
+    resetScore,
     initScore,
     updateScore,
   }

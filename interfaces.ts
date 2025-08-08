@@ -19,8 +19,7 @@ export type TimerType = {
 }
 
 export type AppType = {
-  [x: string]: any;
   app: Application;
   pixiContainer: HTMLDivElement | null;
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | null;
 }

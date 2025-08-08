@@ -1,11 +1,13 @@
 import type { TextType } from "@/interfaces"
 import { BitmapText } from "pixi.js"
+import { useApp } from "@/composables/useApp"
 import { useScore } from "@/composables/useScore"
 
-const config = useAppConfig()
-const { scoreText } = useScore()
 
 export const useLevel = () => {
+  const config = useAppConfig()
+  const { scoreText } = useScore()
+  const { appObj } = useApp()
   const levelText = useState<TextType>('level', () =>  ({
     textObj: new BitmapText({
       text: "level: 0",
@@ -16,10 +18,14 @@ export const useLevel = () => {
     textValue: 0
   }))
 
-  const initLevel = () => {
-    // app.value?.stage.addChild(levelText.value.textObj as BitmapText)
+  const resetLevel = () => {
     levelText.value.textValue = 0
     levelText.value.textObj.text = "level: 0"
+  }
+
+  const initLevel = () => {
+    appObj.value.app.stage.addChild(levelText.value.textObj as BitmapText)
+    resetLevel()
   }
 
   const updateLevel = () => {
@@ -32,6 +38,7 @@ export const useLevel = () => {
 
   return {
     levelText,
+    resetLevel,
     initLevel,
     updateLevel,
   }

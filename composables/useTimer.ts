@@ -1,8 +1,8 @@
 import type { TimerType } from "@/interfaces"
 
-const config = useAppConfig()
 
 export const useTimer = () => {
+  const config = useAppConfig()
   const timer = useState<TimerType>('timer', () => ({
     startTime: null,
     previousTime: null,

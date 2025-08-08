@@ -2,10 +2,10 @@ import type { JewelType } from "@/interfaces"
 import { Graphics } from "pixi.js"
 import { useApp } from "@/composables/useApp"
 
-const config = useAppConfig()
-const { app } = useApp()
 
 export const useBoardJewels = () => {
+  const config = useAppConfig()
+  const { appObj } = useApp()
   const boardJewels = useState<(JewelType | null)[][]>('boardJewels', () => (
     Array(config.board.cellYLen).fill(null).map(
       () => Array(config.board.cellXLen).fill(null)
@@ -36,7 +36,7 @@ export const useBoardJewels = () => {
     boardJewels.value.map((row, yIndex) => {
       row.map((col, xIndex) => {
         if (isAllDelete || col?.isDelete) {
-          app.value.app.stage.removeChild(
+          appObj.value.app.stage.removeChild(
             boardJewels.value[yIndex][xIndex]?.jewel as Graphics
           )
           boardJewels.value[yIndex][xIndex] = null

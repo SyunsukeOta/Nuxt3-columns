@@ -3,10 +3,10 @@ import { colorMap } from "@/jewelData"
 import { useApp } from "@/composables/useApp" 
 import { Graphics } from "pixi.js"
 
-const config = useAppConfig()
-const { app } = useApp()
 
 export const useBlock = () => {
+  const config = useAppConfig()
+  const { appObj } = useApp()
   const activeBlock = useState<JewelType[]>('activeBlock', () => (
     Array(config.jewel.length).fill(null)
   ))
@@ -24,7 +24,7 @@ export const useBlock = () => {
         yId: config.block.startYId + i,
       }
       setBlockPos(jewelData.xId, jewelData.yId, jewelData.jewel as Graphics)
-      app.value.app.stage.addChild(jewelData.jewel as Graphics)
+      appObj.value.app.stage.addChild(jewelData.jewel as Graphics)
       activeBlock.value[i] = jewelData
     }
   }

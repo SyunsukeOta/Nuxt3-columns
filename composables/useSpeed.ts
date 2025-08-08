@@ -1,11 +1,13 @@
 import type { TextType } from "@/interfaces"
 import { BitmapText } from "pixi.js"
 import { useLevel } from "@/composables/useLevel"
+import { useApp } from "@/composables/useApp"
 
-const config = useAppConfig()
-const { levelText } = useLevel()
 
 export const useSpeed = () => {
+  const config = useAppConfig()
+  const { levelText } = useLevel()
+  const { appObj } = useApp()
   const speedText = useState<TextType>('speed', () =>  ({
     textObj: new BitmapText({
       text: "speed: 0",
@@ -16,10 +18,14 @@ export const useSpeed = () => {
     textValue: 0
   }))
 
-  const initSpeed = () => {
-    // app.value?.stage.addChild(speedText.value.textObj as BitmapText)
+  const resetSpeed = () => {
     speedText.value.textValue = 0
     speedText.value.textObj.text = "speed: 0"
+  }
+
+  const initSpeed = () => {
+    appObj.value.app.stage.addChild(speedText.value.textObj as BitmapText)
+    resetSpeed()
   }
 
   const updateSpeed = () => {
@@ -32,6 +38,7 @@ export const useSpeed = () => {
 
   return {
     speedText,
+    resetSpeed,
     initSpeed,
     updateSpeed,
   }
